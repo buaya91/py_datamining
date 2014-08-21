@@ -65,7 +65,9 @@ class TestDataGenerator():
         else:           #when we reach lowest level, which is not dictionary anymore
             a = getattr(self.faker,types)
             if type(a()) is int:
-                dic = a()%6     #we want it to be within [0,5]
+                dic = a()%6     #we want it to be within [1,5]
+                if dic == 0:    #when it is 0, it means it is not rated, set to None
+                    dic = None
             else:
                 dic = a()
 
