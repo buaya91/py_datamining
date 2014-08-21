@@ -64,9 +64,40 @@ def adjusted_cosine_similarity(item_a_name, item_b_name, users_ratings):
 
     return round(numerator_sum/((denominator_sum_a**0.5)*(denominator_sum_b**0.5)),5)
 
-def prob_user_rate_item(user_name,item_name):
-    pass
+def prob_user_rate_item(user_name,item_name,users_ratings):
+    """
+    Pre-condition :
+        user_name is string of username
+        item_name is string of itemname
+        user_ratings is dict containing item:ratings pair of username
+    Post-condition :
+        return expected rating for username to item
+    """
+    if users_ratings[user_name][item_name] != None:
+        print('item already rated by user')
+        return
 
-def change_rating_scale(old_min,old_max,new_min,new_max,rate):
-    return ((rate-old_min)/(old_max-old_min))*(new_max-new_min)+new_min
+    numerator_sum = 0
+    denominator_sum = 0
+    for item in users_ratings[user_name]:
+        if users_ratings[user_name][item] != None:
+            similarity = adjusted_cosine_similarity(item,item_name,users_ratings)
+            numerator_sum += (similarity*
+                change_rating_scale(1,5,-1,1,users_ratings[user_name][item]))
+            denominator_sum += abs(similarity)
+
+
+    return change_rating_scale(-1,1,1,5,numerator_sum/denominator_sum)
+
+def change_rating_scale(old_min,old_max,new_min,new_max,rating):
+    """
+    change rating scale
+    Pre-condition :
+        old_min must be smaller than old_max
+        new_min must be smaller than new_max
+        rating must between old_min and old_max
+    Post-condition :
+        return the modified rating
+    """
+    return ((rating-old_min)/(old_max-old_min))*(new_max-new_min)+new_min
 
