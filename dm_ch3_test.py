@@ -45,6 +45,33 @@ class DataMiningCh3Test(unittest.TestCase):
                         ex = dm_ch3.prob_user_rate_item(u,i,self.users_ratings)
                         self.assertTrue(1<=ex<=5)
 
+    def test_change_rating_scale(self):
+        for i in range(11):
+            self.assertEqual(dm_ch3.change_rating_scale(0,10,-1,1,i),round((-1+(i*0.2)),5))
+
+    def test_get_list_from_table_using_row_as_key(self):
+        # create 2d table
+        self.setup()
+
+        # get 1st key from table
+        key1 = list(self.users_ratings.keys())[0]
+        l = dm_ch3.get_list_from_table(key1,self.users_ratings)
+        # use function to extract and compare with table[key]
+        self.assertDictEqual(self.users_ratings[key1],l)
+
+        #test for col
+        key1 = list(l.keys())[0]
+        l = dm_ch3.get_list_from_table(key1,self.users_ratings)
+        self.assertEqual(len(l),len(self.users_ratings))
+
+    def test_compute_deviation_from_a_to_b(self):
+        self.setup()
+        k1 = list(self.users_ratings.keys())[0]
+        k2 = list(self.users_ratings[k1].keys())[0]
+        k3 = list(self.users_ratings[k1].keys())[1]
+        a_to_b = dm_ch3.compute_deviation_from_a_to_b(k3,k2,self.users_ratings)
+        b_to_a = dm_ch3.compute_deviation_from_a_to_b(k2,k3,self.users_ratings)
+        self.assertEqual(a_to_b,-b_to_a)
 
 if __name__ == '__main__':
     unittest.main()
