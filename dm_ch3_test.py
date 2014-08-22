@@ -73,5 +73,31 @@ class DataMiningCh3Test(unittest.TestCase):
         b_to_a = dm_ch3.compute_deviation_from_a_to_b(k2,k3,self.users_ratings)
         self.assertEqual(a_to_b,-b_to_a)
 
+        a_to_b = dm_ch3.compute_deviation_from_a_to_b(k2,k2,self.users_ratings)
+        self.assertEqual(a_to_b,0)
+
+    def test_card_func(self):
+        test_dict = {}
+        for i in range(1,11):
+            test_dict[str(i)] = {}
+            for j in range(11,16):
+                if j>13 and i<3:
+                    test_dict[str(i)][str(j)] = i*j
+                else:
+                    test_dict[str(i)][str(j)] = None
+        print(test_dict)
+        self.assertEqual(dm_ch3.user_no_rated_both_item('14','15',test_dict),2)
+
+    def test_slope_one_prediction(self):
+        run = False
+        while run is False:
+            self.setup()
+            for u in self.users_ratings:
+                for i in self.users_ratings[u]:
+                    if self.users_ratings[u][i] == None:
+                        run = True
+                        ex = dm_ch3.slope_one_prediction(u,i,self.users_ratings)
+                        self.assertTrue(1<=ex<=5)
+
 if __name__ == '__main__':
     unittest.main()

@@ -151,3 +151,67 @@ def compute_deviation_from_a_to_b(item_a,item_b,users_ratings):
 
     return round(sum_of_deviation/no_user_rated_both,2)
 
+def user_no_rated_both_item(item_a,item_b,users_ratings):
+    item_a_ratings = get_list_from_table(item_a,users_ratings)
+    item_b_ratings = get_list_from_table(item_b,users_ratings)
+
+    card = 0
+    for user in item_a_ratings:
+        if (item_a_ratings[user] != None
+            and item_b_ratings[user] != None):
+                card += 1
+
+    return card
+
+def slope_one_prediction(user,item,users_ratings):
+    """
+    create prediction of a user to an item using slope one algorithm
+    """
+
+    # what we need?
+    # 1. a matrix consisting deviation between items, consist [n^2 - n] data where
+    #    n = no of items, the data should be a tuples (deviation, no of people rated both)
+    # 2. list of items' rating by user
+
+    # to generate the matrix, we only have to compute half of them,
+    # as (dev(a,b),N) == (-dev(b,a),N)
+
+    #-------------------------------------------------------
+    # get all items name
+    try:
+        items_name = list(users_ratings[user].keys())
+    except KeyError:
+        print('username invalid, please provide a valid username')
+        return
+    # loop thru item names to get deviation of all combinations of items
+    # but we should not compute all of them, with the condition
+    # for item a to item a, it is definitely 1
+    # for item b to item a, it will be -1 multiple from a to b
+
+    deviation_matrix = {}
+    card_matrix = {}
+    for index_a,item_a in enumerate(items_name):
+        deviation_matrix[item_a] = {}
+        card_matrix[item_a] = {}
+        for index_b,item_b in enumerate(items_name):
+            if index_a == index_b:
+                deviation_matrix[item_a][item_b] = 1
+                card_matrix[item_a][item_b] = user_no_rated_both_item(item_a,item_b,users_ratings)
+            elif index_a < index_b:
+                deviation_matrix[item_a][item_b] = compute_deviation_from_a_to_b(item_a,item_b,users_ratings)
+                card_matrix[item_a][item_b] = user_no_rated_both_item(item_a,item_b,users_ratings)
+            elif index_a > index_b:
+                deviation_matrix[item_a][item_b] = -deviation_matrix[item_b][item_a]
+                card_matrix[item_a][item_b] = card_matrix[item_b][item_a]
+
+    numerator_sum = 0
+    denominator_sum = 0
+
+    for i in users_ratings[user]:
+        if i == item or users_ratings[user][i]==None:
+            continue
+        numerator_sum += (deviation_matrix[item][i] + users_ratings[user][i])*card_matrix[item][i]
+        denominator_sum += card_matrix[item][i]
+
+    return round(numerator_sum/denominator_sum,5)
+

@@ -106,7 +106,7 @@ class TestDataGenerator():
                     value_holder[key] = value
             value = value_holder.copy()
 
-        self.randomize_dict_values(value_type,value_holder)
-        return value_holder
+        # self.randomize_dict_values(value_type,value_holder)
+        return self.randomize_dict_values(value_type,value_holder)
 
 
